@@ -13,6 +13,8 @@ app.post("/sign-up", (req, res) => {
 
   if (paramsIsInvalid(username, avatar)) {
     res.status(400).send("Todos os campos são obrigatórios!");
+  } else if (avatarIsInvalid) {
+    res.status(400).send("O avatar deve ser uma URL válida!");
   } else {
     users.push(req.body);
     res.status(201).send("OK");
@@ -20,17 +22,24 @@ app.post("/sign-up", (req, res) => {
 });
 
 app.get("/tweets", (req, res) => {
-  // pegar apenas os 10 ultimos tweets
-  const newTweets = [...tweets.reverse()];
-  res.status(201).send(newTweets.slice(0, 10));
+  const { page } = req.query;
+
+  if (pageIsInvalid(page)) res.status(400).send("Informe uma página válida!");
+
+  page = parseInt(page);
+  const tweetsPerPage = 10;
+  const startTweet = (page - 1) * tweetsPerPage;
+  const endTweet = page * tweetsPerPage;
+
+  const tweetsToShow = [...tweets].reverse().slice(startTweet, endTweet);
+  res.status(201).send(tweetsToShow);
 });
 
 app.post("/tweets", (req, res) => {
-  // depois fazer paginacao
   const { tweet } = req.body;
   const { user } = req.headers;
-  console.log(user, tweet);
-  if (paramsIsInvalid(tweet)) {
+
+  if (paramsIsInvalid(user, tweet)) {
     res.status(400).send("Todos os campos são obrigatórios!");
   } else {
     const avatar = users.find((u) => u.username === user).avatar;
@@ -39,11 +48,25 @@ app.post("/tweets", (req, res) => {
   }
 });
 
-function paramsIsInvalid(username = null, avatar = null, tweet = null) {
-  if (username === undefined || username === "") return true;
-  if (avatar === undefined || avatar === "") return true;
-  if (tweet === undefined || tweet === "") return true;
-  return false;
+app.get("/tweets/:username", (req, res) => {
+  const { username } = req.params;
+  const tweetsUser = tweets.filter((tweet) => tweet.username === username);
+  tweetsUser.length > 0
+    ? res.status(200).send(tweetsUser)
+    : res.status(400).send("Não foi encontrado tweets desse usuário!");
+});
+
+function paramsIsInvalid(...params) {
+  return params.some((param) => param === undefined || param === "");
+}
+
+function pageIsInvalid(page) {
+  return page < 1 || isNaN(parseInt(page)) || page === undefined;
+}
+
+function avatarIsInvalid(urlAvatar) {
+  let re = new RegExp("^((http(s?)://?)|(magnet:?xt=urn:btih:))");
+  return re.test(urlAvatar);
 }
 
 app.listen(5000, () => {
