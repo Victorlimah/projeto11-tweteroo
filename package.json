@@ -1,0 +1,13 @@
+{
+  "name": "projeto11-tweteroo",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "API for Twitter clone",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Victor",
+  "license": "ISC"
+}
