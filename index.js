@@ -9,13 +9,21 @@ let users = [];
 let tweets = [];
 
 app.post("/sign-up", (req, res) => {
-  if (req.body.username === "" || req.body.avatar === "") {
+  const { username, avatar } = req.body;
+
+  if (paramsIsInvalid()) {
     res.status(400).send("Todos os campos são obrigatórios!");
-    return;
+  } else {
+    users.push(req.body);
+    res.status(200).send("OK");
   }
 
-  users.push(req.body);
-  res.status(200).send("OK");
+  function paramsIsInvalid() {
+    if (username === undefined || username === "") return true;
+    if (avatar === undefined || avatar === "") return true;
+    if (!avatar.startsWith("http")) return true;
+    return false;
+  }
 });
 
 app.post("/tweets", (req, res) => {
