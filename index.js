@@ -13,8 +13,8 @@ app.post("/sign-up", (req, res) => {
 
   if (paramsIsInvalid(username, avatar)) {
     res.status(400).send("Todos os campos são obrigatórios!");
-  } else if (avatarIsInvalid) {
-    res.status(400).send("O avatar deve ser uma URL válida!");
+  } else if (avatarIsInvalid(avatar)) {
+    res.status(400).send("A URL do avatar não é válida!");
   } else {
     users.push(req.body);
     res.status(201).send("OK");
@@ -22,7 +22,7 @@ app.post("/sign-up", (req, res) => {
 });
 
 app.get("/tweets", (req, res) => {
-  const { page } = req.query;
+  let { page } = req.query;
 
   if (pageIsInvalid(page)) res.status(400).send("Informe uma página válida!");
 
@@ -65,8 +65,8 @@ function pageIsInvalid(page) {
 }
 
 function avatarIsInvalid(urlAvatar) {
-  let re = new RegExp("^((http(s?)://?)|(magnet:?xt=urn:btih:))");
-  return re.test(urlAvatar);
+  let re = new RegExp("(http|https)://");
+  return !re.test(urlAvatar);
 }
 
 app.listen(5000, () => {
