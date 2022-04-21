@@ -6,7 +6,14 @@ app.use(json());
 app.use(cors());
 
 let users = [];
-let tweets = [];
+let tweets = [
+  {
+    username: "bobesponja",
+    avatar:
+      "https://super.abril.com.br/wp-content/uploads/2020/09/04-09_gato_SITE.jpg?quality=70&strip=info",
+    tweet: "eu amo o hub",
+  },
+];
 
 app.post("/sign-up", (req, res) => {
   const { username, avatar } = req.body;
@@ -26,15 +33,14 @@ app.post("/sign-up", (req, res) => {
   }
 });
 
-app.post("/tweets", (req, res) => {
-  const { username, tweet } = req.body;
-  const user = users.find((user) => user.username === username);
-  const avatar = user.avatar;
-  tweets.push({ username, tweet, avatar });
+app.get("/tweets", (req, res) => {
+  res.status(200).send(tweets);
 });
 
-app.get("/tweets", (req, res) => {
-  res.send(tweets);
+app.post("/tweets", (req, res) => {
+  const { username, tweet } = req.body;
+  const avatar = users.find((user) => user.username === username).avatar;
+  tweets.push({ username, tweet, avatar });
 });
 
 app.listen(5000, () => {
